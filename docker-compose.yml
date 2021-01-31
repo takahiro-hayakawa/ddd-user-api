@@ -1,9 +1,23 @@
 version: "3.8"
 services:
+  db:
+    build:
+      context: ./docker/db/
+    ports:
+      - 3306:3306
+    volumes:
+      - ./docker/db:/docker-entrypoint-initdb.d
+      - ./docker/db/mysql_data:/var/lib/mysql
+    env_file:
+      - ./docker/db/db.env
+
   api:
     container_name: user-api-server
     build:
       context: .
+      dockerfile: ./docker/api/Dockerfile
       target: runtime
     ports:
       - 3000:3000
+    depends_on:
+      - db
