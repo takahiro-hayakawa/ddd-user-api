@@ -3,11 +3,11 @@ package main
 import "time"
 
 type UserDTO struct {
-	ID          int `gorm:"AUTO_INCREMENT"`
+	ID          int `gorm:"primary_key;auto_increment;not_null"`
 	Name        string
 	MailAddress string
-	CreatedAt   *time.Time
-	UpdatedAt   *time.Time
+	CreatedTime time.Time
+	UpdatedTime time.Time
 }
 
 func (UserDTO) TableName() string {

@@ -12,14 +12,18 @@ func NewUserApplicationService(userRepository IUserRepository, userService UserS
 	return userApplicationService
 }
 
-func (userApplicationService UserApplicationService) Register(name string) (err error) {
+func (userApplicationService UserApplicationService) Register(name string) error {
 	userName := NewUserName(name)
 	user := NewUserByUserName(userName)
 	duplicatedUser := userApplicationService.userService.Exists(user)
 	if duplicatedUser {
 		return fmt.Errorf("user already exist")
 	}
-	userApplicationService.userRepository.Save(user)
+	fmt.Println(user.Name.Value)
+	err := userApplicationService.userRepository.Save(user)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

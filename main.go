@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	"net/http"
 	"strconv"
 )
 
@@ -29,11 +31,19 @@ func main() {
 	})
 
 	r.POST("/user/", func(c *gin.Context) {
-		userName := c.Param("name")
-		userApplicationService.Register(userName)
+		userName := c.PostForm("name")
+		fmt.Println(userName)
+		err := userApplicationService.Register(userName)
 
-		c.JSON(200, gin.H{
-			"message": "success",
+		statusCode := http.StatusOK
+		message := "success"
+		if err != nil {
+			statusCode = http.StatusNotFound
+			message = "fail"
+		}
+
+		c.JSON(statusCode, gin.H{
+			"message": message,
 		})
 	})
 
@@ -47,7 +57,7 @@ func gormConnect() *gorm.DB {
 	PROTOCOL := "tcp(localhost:3306)"
 	DBNAME := "user_db"
 
-	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME
+	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?parseTime=true"
 	db, err := gorm.Open(DBMS, CONNECT)
 
 	if err != nil {

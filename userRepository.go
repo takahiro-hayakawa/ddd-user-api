@@ -1,6 +1,10 @@
 package main
 
-import "github.com/jinzhu/gorm"
+import (
+	"fmt"
+	"github.com/jinzhu/gorm"
+	"time"
+)
 
 type UserRepository struct {
 	db *gorm.DB
@@ -11,8 +15,16 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return userRepository
 }
 
-func (UserRepository) Save(user User) {
-	return
+func (uRepo UserRepository) Save(user User) error {
+	now := time.Now()
+	fmt.Println(user.Name.Value)
+	userDTO := UserDTO{Name: user.Name.Value, MailAddress: user.MailAddress.Value, CreatedTime: now, UpdatedTime: now}
+	result := uRepo.db.Create(&userDTO)
+
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
 func (uRepo UserRepository) FindByUserID(userID UserID) *User {
