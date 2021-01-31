@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  api:
+    container_name: user-api-server
+    build:
+      context: .
+      target: runtime
+    ports:
+      - 3000:3000
