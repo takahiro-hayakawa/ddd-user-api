@@ -1,12 +1,15 @@
 package main
 
+import "time"
+
 type UserDTO struct {
-	ID          int
+	ID          int `gorm:"AUTO_INCREMENT"`
 	Name        string
 	MailAddress string
+	CreatedAt   *time.Time
+	UpdatedAt   *time.Time
 }
 
-func NewUserDTO(user User) UserDTO {
-	userDTO := UserDTO{user.ID.Value, user.Name.Value, user.MailAddress.Value}
-	return userDTO
+func (UserDTO) TableName() string {
+	return "user"
 }

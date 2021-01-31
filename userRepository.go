@@ -1,10 +1,13 @@
 package main
 
+import "github.com/jinzhu/gorm"
+
 type UserRepository struct {
+	db *gorm.DB
 }
 
-func NewUserRepository() UserRepository {
-	userRepository := UserRepository{}
+func NewUserRepository(db *gorm.DB) UserRepository {
+	userRepository := UserRepository{db}
 	return userRepository
 }
 
@@ -12,8 +15,10 @@ func (UserRepository) Save(user User) {
 	return
 }
 
-func (UserRepository) FindByUserID(userID UserID) *User {
-	user := NewUser(userID, NewUserName("takahiro"), NewMailAddress("hoge@aaa.com"))
+func (uRepo UserRepository) FindByUserID(userID UserID) *User {
+	var userDTO UserDTO
+	uRepo.db.First(&userDTO, userID.Value)
+	user := NewUser(userID, NewUserName(userDTO.Name), NewMailAddress(userDTO.MailAddress))
 	return &user
 }
 

@@ -23,11 +23,10 @@ func (userApplicationService UserApplicationService) Register(name string) (err 
 	return nil
 }
 
-func (userApplicationService UserApplicationService) Find(userID int) UserDTO {
+func (userApplicationService UserApplicationService) Find(userID int) User {
 	targetUserID := NewUserID(userID)
 	user := userApplicationService.userRepository.FindByUserID(targetUserID)
-	userDTO := NewUserDTO(*user)
-	return userDTO
+	return *user
 }
 
 func (userApplicationService UserApplicationService) Update(command UserUpdateCommand) (err error) {
