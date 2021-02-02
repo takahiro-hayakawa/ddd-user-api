@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -47,21 +48,32 @@ func main() {
 		})
 	})
 
-	r.Run(":8000")
+	r.Run(":3000")
 }
 
 func gormConnect() *gorm.DB {
 	DBMS := "mysql"
 	USER := "root"
 	PASS := "password"
-	PROTOCOL := "tcp(localhost:3306)"
+	PROTOCOL := "tcp(docker.for.mac.localhost:3306)"
 	DBNAME := "user_db"
 
 	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?parseTime=true"
-	db, err := gorm.Open(DBMS, CONNECT)
 
-	if err != nil {
-		panic(err.Error())
+	// docker-composeでDBの起動を待つ
+	count := 0
+	var db *gorm.DB
+	var err error
+	for {
+		db, err = gorm.Open(DBMS, CONNECT)
+		if err == nil {
+			return db
+		}
+
+		if err != nil && count == 30 {
+			panic(err)
+		}
+		count++
+		time.Sleep(time.Second)
 	}
-	return db
 }
