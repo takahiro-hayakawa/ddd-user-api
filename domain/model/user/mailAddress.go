@@ -1,4 +1,4 @@
-package main
+package model
 
 type MailAddress struct {
 	Value string

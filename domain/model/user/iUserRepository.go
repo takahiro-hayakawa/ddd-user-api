@@ -1,4 +1,4 @@
-package main
+package model
 
 type IUserRepository interface {
 	Save(user User) error

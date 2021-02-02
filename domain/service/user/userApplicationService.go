@@ -1,20 +1,23 @@
-package main
+package service
 
-import "fmt"
+import (
+	"fmt"
+	mUser "github.com/takahiro-hayakawa/user-api-server/domain/model/user"
+)
 
 type UserApplicationService struct {
-	userRepository IUserRepository
+	userRepository mUser.IUserRepository
 	userService    UserService
 }
 
-func NewUserApplicationService(userRepository IUserRepository, userService UserService) UserApplicationService {
+func NewUserApplicationService(userRepository mUser.IUserRepository, userService UserService) UserApplicationService {
 	userApplicationService := UserApplicationService{userRepository, userService}
 	return userApplicationService
 }
 
 func (userApplicationService UserApplicationService) Register(name string) error {
-	userName := NewUserName(name)
-	user := NewUserByUserName(userName)
+	userName := mUser.NewUserName(name)
+	user := mUser.NewUserByUserName(userName)
 	duplicatedUser := userApplicationService.userService.Exists(user)
 	if duplicatedUser {
 		return fmt.Errorf("user already exist")
@@ -27,14 +30,14 @@ func (userApplicationService UserApplicationService) Register(name string) error
 	return nil
 }
 
-func (userApplicationService UserApplicationService) Find(userID int) User {
-	targetUserID := NewUserID(userID)
+func (userApplicationService UserApplicationService) Find(userID int) mUser.User {
+	targetUserID := mUser.NewUserID(userID)
 	user := userApplicationService.userRepository.FindByUserID(targetUserID)
 	return *user
 }
 
-func (userApplicationService UserApplicationService) Update(command UserUpdateCommand) (err error) {
-	targetID := NewUserID(command.ID)
+func (userApplicationService UserApplicationService) Update(command UserUpdateCommand) error {
+	targetID := mUser.NewUserID(command.ID)
 	user := userApplicationService.userRepository.FindByUserID(targetID)
 	if user == nil {
 		return fmt.Errorf("user not exist")
@@ -42,7 +45,7 @@ func (userApplicationService UserApplicationService) Update(command UserUpdateCo
 
 	name := command.Name
 	if name != "" {
-		newUserName := NewUserName(name)
+		newUserName := mUser.NewUserName(name)
 		user.ChangeName(newUserName)
 		duplicatedUser := userApplicationService.userService.Exists(*user)
 		if duplicatedUser {
@@ -52,9 +55,12 @@ func (userApplicationService UserApplicationService) Update(command UserUpdateCo
 
 	mailAddress := command.MailAddress
 	if mailAddress != "" {
-		newMailAddress := NewMailAddress(mailAddress)
+		newMailAddress := mUser.NewMailAddress(mailAddress)
 		user.ChangeMailAddress(newMailAddress)
 	}
-	userApplicationService.userRepository.Save(*user)
+	err := userApplicationService.userRepository.Save(*user)
+	if err != nil {
+		return err
+	}
 	return nil
 }

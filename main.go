@@ -5,6 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	sUser "github.com/takahiro-hayakawa/user-api-server/domain/service/user"
+	iDB "github.com/takahiro-hayakawa/user-api-server/infrastructure/db"
 	"net/http"
 	"strconv"
 	"time"
@@ -15,9 +17,9 @@ func main() {
 	defer db.Close()
 
 	r := gin.Default()
-	iUserRepository := NewUserRepository(db)
-	userService := NewUserService(iUserRepository)
-	userApplicationService := NewUserApplicationService(iUserRepository, userService)
+	iUserRepository := iDB.NewUserRepository(db)
+	userService := sUser.NewUserService(iUserRepository)
+	userApplicationService := sUser.NewUserApplicationService(iUserRepository, userService)
 
 	r.GET("/user/:id", func(c *gin.Context) {
 		idStr := c.Param("id")
