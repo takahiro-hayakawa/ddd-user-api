@@ -3,8 +3,10 @@ services:
   api:
     build:
       context: .
-      dockerfile: ./docker/api/Dockerfile
+      dockerfile: docker/api/Dockerfile
       target: runtime
+    volumes:
+      - ./:/go/app
     ports:
       - 3000:3000
     depends_on:

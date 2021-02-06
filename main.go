@@ -50,6 +50,27 @@ func main() {
 		})
 	})
 
+	r.PATCH("/user/:id", func(c *gin.Context) {
+		idStr := c.Param("id")
+		id, _ := strconv.Atoi(idStr)
+		userName := c.PostForm("name")
+		mailAddress := c.PostForm("maid_address")
+
+		userUpdateCommand := sUser.NewUserUpdateCommand(id, userName, mailAddress)
+		err := userApplicationService.Update(userUpdateCommand)
+
+		statusCode := http.StatusOK
+		message := "success"
+		if err != nil {
+			statusCode = http.StatusNotFound
+			message = "fail"
+		}
+
+		c.JSON(statusCode, gin.H{
+			"message": message,
+		})
+	})
+
 	r.Run(":3000")
 }
 

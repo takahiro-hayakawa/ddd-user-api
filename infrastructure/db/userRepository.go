@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"fmt"
 	"github.com/jinzhu/gorm"
 	mUser "github.com/takahiro-hayakawa/user-api-server/domain/model/user"
 	sUser "github.com/takahiro-hayakawa/user-api-server/domain/service/user"
@@ -19,10 +18,13 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 
 func (uRepo UserRepository) Save(user mUser.User) error {
 	now := time.Now()
-	fmt.Println(user.Name.Value)
-	userDTO := sUser.UserDTO{Name: user.Name.Value, MailAddress: user.MailAddress.Value, CreatedTime: now, UpdatedTime: now}
+	var userDTO sUser.UserDTO
+	if user.ID.Value == 0 {
+		userDTO = sUser.UserDTO{Name: user.Name.Value, MailAddress: user.MailAddress.Value, CreatedTime: now, UpdatedTime: now}
+	} else {
+		userDTO = sUser.UserDTO{ID: user.ID.Value, Name: user.Name.Value, MailAddress: user.MailAddress.Value, CreatedTime: now, UpdatedTime: now}
+	}
 	result := uRepo.db.Create(&userDTO)
-
 	if result.Error != nil {
 		return result.Error
 	}

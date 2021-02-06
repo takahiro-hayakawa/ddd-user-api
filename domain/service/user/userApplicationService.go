@@ -22,7 +22,6 @@ func (userApplicationService UserApplicationService) Register(name string) error
 	if duplicatedUser {
 		return fmt.Errorf("user already exist")
 	}
-	fmt.Println(user.Name.Value)
 	err := userApplicationService.userRepository.Save(user)
 	if err != nil {
 		return err
